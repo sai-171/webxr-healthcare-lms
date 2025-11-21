@@ -1,0 +1,6 @@
+{
+  "python.pythonPath": "C:/Users/2001s/webxr-healthcare-lms/backend/venv/Scripts/python.exe",
+  "python.analysis.extraPaths": [
+    "C:/Users/2001s/webxr-healthcare-lms/backend/venv/Lib/site-packages"
+  ]
+}
