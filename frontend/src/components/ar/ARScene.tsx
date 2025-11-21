@@ -39,7 +39,7 @@ const InnerScene: React.FC<ARSceneProps> = ({
     return new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
   }, []);
 
-  useFrame((_, delta) => {
+  useFrame(() => {
     const val = sliceValue ?? 0;
     const mappedSlice = (val / 100) * 5 - 2.5; 
     clipPlane.constant = mappedSlice;

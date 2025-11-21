@@ -4,7 +4,7 @@ import { useAuth } from '../store/auth';
 import type { Achievement } from '../types';
 
 export const AchievementsPage: React.FC = () => {
-  const { user } = useAuth();
+  const { } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'completion' | 'performance' | 'streak' | 'special'>('all');
 
   const mockAchievements: Achievement[] = [

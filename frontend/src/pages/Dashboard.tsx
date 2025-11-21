@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../store/auth';
-import { BookOpen, Users, Award, TrendingUp, Clock, Box } from 'lucide-react';
+import { BookOpen, Award, Clock, Box } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();

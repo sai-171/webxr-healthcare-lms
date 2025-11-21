@@ -217,12 +217,15 @@ export interface HeartAnnotation {
   position: [number, number, number];
   title: string;
   description: string;
-  detailedInfo: string;
+  detailedInfo?: string;
   type: 'chamber' | 'valve' | 'vessel' | 'muscle';
   color: string;
-  medicalTerms: string[];
-  functions: string[];
+  medicalTerms?: string[];            // optional if not all annotations have it
+  functions?: string[];               // optional if not all annotations have it
+  clinicalSignificance?: string;      // add this
+  relatedStructures?: string[];       // add this if you use it in data/UI
 }
+
 
 export interface AnnotationState {
   selectedId: string | null;
@@ -265,3 +268,4 @@ export interface Module {
   description: string;
   lessons: Lesson[];
 }
+

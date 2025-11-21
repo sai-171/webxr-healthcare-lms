@@ -16,7 +16,7 @@ interface ScheduleItem {
 }
 
 export const SchedulePage: React.FC = () => {
-  const { user } = useAuth();
+  const {} = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
 

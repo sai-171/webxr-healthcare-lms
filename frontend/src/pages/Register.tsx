@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, Heart, UserCheck, GraduationCap } from 'lucide-react';
 import { useAuth } from '../store/auth';
 import { Button } from '../components/shared/Button';
 import type { RegisterData } from '../types';
@@ -10,25 +9,19 @@ import type { RegisterData } from '../types';
 export const RegisterPage: React.FC = () => {
   const { register: registerUser, isLoading } = useAuth();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<'student' | 'instructor'>('student');
 
   const {
     register,
     handleSubmit,
-    watch,
-    formState: { errors }
   } = useForm<RegisterData & { confirmPassword: string }>({
     defaultValues: {
       role: 'student'
     }
   });
 
-  const watchPassword = watch('password');
-
   const onSubmit = async (data: RegisterData & { confirmPassword: string }) => {
     const { confirmPassword, ...registerData } = data;
-    registerData.role = selectedRole;
+    registerData.role = 'student'; // fixed role if no UI to choose it
     
     const success = await registerUser(registerData);
     if (success) {
@@ -41,7 +34,6 @@ export const RegisterPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Hero section and form content similar to Login */}
       <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-16">
         <div className="w-full max-w-md mx-auto">
           <div className="text-center mb-8">
@@ -53,7 +45,6 @@ export const RegisterPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Simplified register form for now */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

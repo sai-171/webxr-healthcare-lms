@@ -39,7 +39,7 @@ interface ARStore extends ARState, ARActions {}
 
 export const useAR = create<ARStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // Initial State
       isLoading: false,
       error: null,
