@@ -37,10 +37,9 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const [modelLoaded, setModelLoaded] = useState(false);
-  const [modelInfo, setModelInfo] = useState<ModelInfo | null>(null);
   const [loadingError, setLoadingError] = useState<string | null>(null);
 
-  // Load GLTF model (useGLTF returns scene and animations only; error, nodes, materials are not part of the return)
+  // Load GLTF model (useGLTF returns scene and animations only)
   const { scene, animations } = useGLTF(modelPath, true);
 
   const calculateModelInfo = useCallback((modelScene: THREE.Group): ModelInfo => {
@@ -69,6 +68,7 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
         }
       }
     });
+
     return {
       boundingBox,
       meshCount,
@@ -84,7 +84,6 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
     if (scene) {
       try {
         const info = calculateModelInfo(scene);
-        setModelInfo(info);
         scene.traverse((child: any) => {
           if (child instanceof THREE.Mesh) {
             child.castShadow = true;
@@ -232,10 +231,9 @@ export const ModelUtils = {
     }
   },
 
-clearCache: (path: string) => {
-  useGLTF.clear(path);
-}
-
+  clearCache: (path: string) => {
+    useGLTF.clear(path);
+  },
 };
 
 export type { ModelInfo };

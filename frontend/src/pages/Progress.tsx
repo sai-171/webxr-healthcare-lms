@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, Target, Clock, Award, BookOpen, CheckCircle, Calendar, BarChart3 } from 'lucide-react';
+import { TrendingUp, Target, Clock, Award, BookOpen, CheckCircle} from 'lucide-react';
 import { useAuth } from '../store/auth';
 
 export const ProgressPage: React.FC = () => {
