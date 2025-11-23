@@ -7,13 +7,22 @@ interface PredictMedicalImageResponse {
   [key: string]: any;
 }
 
-// Upload medical image for prediction
-export async function predictMedicalImage(file: File, generateExplanation = true): Promise<PredictMedicalImageResponse> {
+/**
+ * Uploads a medical image for prediction using the specified model.
+ * @param file - Image file (usually from file input).
+ * @param modelType - 'mobilenetv2' (default/lightweight) or 'hybrid_cnn_vit' (advanced/experimental).
+ * @param generateExplanation - If true, requests a GradCAM/heatmap from the API (hybrid only).
+ */
+export async function predictMedicalImage(
+  file: File,
+  modelType: 'mobilenetv2' | 'hybrid_cnn_vit' = 'mobilenetv2',
+  generateExplanation = true
+): Promise<PredictMedicalImageResponse> {
   const formData = new FormData();
   formData.append('file', file);
 
-  // Send generate_explanation as a query parameter, not form data
-  const url = `${API_BASE_URL}/api/medical/predict?generate_explanation=${generateExplanation}`;
+  // Add both query parameters
+  const url = `${API_BASE_URL}/api/medical/predict?generate_explanation=${generateExplanation}&model_type=${modelType}`;
 
   const response = await fetch(url, {
     method: 'POST',

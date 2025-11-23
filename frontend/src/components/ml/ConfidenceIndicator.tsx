@@ -1,4 +1,3 @@
-// src/components/ml/ConfidenceIndicator.tsx
 import React from "react";
 
 interface ConfidenceIndicatorProps {
@@ -6,26 +5,23 @@ interface ConfidenceIndicatorProps {
 }
 
 export const ConfidenceIndicator: React.FC<ConfidenceIndicatorProps> = ({ confidence }) => {
-  const percent = Number((confidence * 100).toFixed(2));
+  const percent = Math.max(0, Math.min(100, Math.round(Number(confidence) * 100)));
 
-  // Color scale from red (low confidence) to green (high confidence)
   const getColor = () => {
-    if (confidence < 0.5) return "#e55353"; // red shades
-    if (confidence < 0.75) return "#f0ad4e"; // orange
-    return "#5cb85c"; // green
+    if (confidence < 0.5) return "#e55353";
+    if (confidence < 0.75) return "#f0ad4e";
+    return "#5cb85c";
   };
 
   return (
-    <div className="confidence-indicator">
-      <label htmlFor="confidence-bar" className="sr-only">
-        Confidence Level
-      </label>
+    <div>
       <div
         id="confidence-bar"
         role="progressbar"
-        aria-valuemin={Number(0)}
-        aria-valuemax={Number(100)}
-        aria-valuenow={Number(percent)}
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuetext={`Confidence is ${percent}%`}
         style={{
           width: "100%",
           backgroundColor: "#e0e0e0",
@@ -39,7 +35,7 @@ export const ConfidenceIndicator: React.FC<ConfidenceIndicatorProps> = ({ confid
             width: `${percent}%`,
             height: "100%",
             backgroundColor: getColor(),
-            transition: "width 0.4s ease",
+            transition: "width 0.4s ease"
           }}
         />
       </div>

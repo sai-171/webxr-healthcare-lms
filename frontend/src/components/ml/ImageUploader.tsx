@@ -3,6 +3,9 @@ import { Upload, X, Image as ImageIcon, Loader2, AlertCircle, ScanSearch } from 
 // Import your existing API service
 import { predictMedicalImage } from '../../services/api';
 
+// Toggle hybrid option based on environment variable
+const enableHybridModel = import.meta.env.VITE_ENABLE_HYBRID_MODEL === 'true';
+
 interface ImageUploaderProps {
   onPrediction: (result: any) => void;
 }
@@ -12,7 +15,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const [modelType, setModelType] = useState<'mobilenetv2' | 'hybrid_cnn_vit'>('mobilenetv2');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,16 +51,14 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
 
   const handleUpload = async () => {
     if (!selectedImage) {
-        setError("No file selected.");
-        return;
+      setError("No file selected.");
+      return;
     }
-
     setIsLoading(true);
     setError(null);
-
     try {
-      // Using your existing service function
-      const predictionResult = await predictMedicalImage(selectedImage, true);
+      // Pass selected modelType!
+      const predictionResult = await predictMedicalImage(selectedImage, modelType, true);
       onPrediction(predictionResult);
     } catch (err: any) {
       console.error("Upload error:", err);
@@ -67,8 +68,33 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
     }
   };
 
-  return (
-    <div className="w-full">
+return (
+   <div className="w-full">
+   {/* --- Model Selector Dropdown --- */}
+     {/* FIX: Replace 'gap-2 mb-3' with a responsive flex container.
+        We'll use 'w-full' to ensure it takes full width, and 'items-center' 
+        to keep the label and select aligned.
+        We add 'flex' and 'justify-between' or 'flex-grow' to control spacing.
+      */}
+     <div className="flex w-full items-center mb-3"> 
+     <label htmlFor="model-select" className="text-sm font-medium text-gray-300 flex-shrink-0 mr-3">
+         Model:
+        </label>
+        <select
+          id="model-select"
+          value={modelType}
+          onChange={(e) => setModelType(e.target.value as 'mobilenetv2' | 'hybrid_cnn_vit')}
+          disabled={isLoading}
+          // FIX: Add 'flex-grow' or 'w-full' to make the select element take up the remaining space
+          className="bg-gray-800 text-gray-100 p-2 rounded border border-gray-700 focus:border-purple-400 transition w-full"
+        >
+          <option value="mobilenetv2">MobileNetV2 (Fast)</option>
+          {enableHybridModel && (
+            <option value="hybrid_cnn_vit">Hybrid CNN-ViT (Advanced, local only)</option>
+          )}
+        </select>
+      </div>
+
       {/* --- Hidden Native Input --- */}
       <input
         id="image-upload"
@@ -81,7 +107,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
       />
 
       {!selectedImage ? (
-        /* --- Drop Zone --- */
         <div
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
@@ -105,7 +130,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
           </div>
         </div>
       ) : (
-        /* --- Preview & Actions --- */
         <div className="space-y-4 animate-fade-in">
           <div className="relative w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center group">
             <img 
@@ -113,8 +137,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
               alt="Preview" 
               className="max-h-full max-w-full object-contain"
             />
-            
-            {/* Remove Button Overlay */}
             <button
               onClick={clearImage}
               disabled={isLoading}
@@ -125,8 +147,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
               <X className="w-4 h-4" />
             </button>
           </div>
-
-          {/* Info Bar */}
           <div className="flex items-center justify-between px-2 text-sm text-gray-400">
              <div className="flex items-center gap-2">
                 <ImageIcon className="w-4 h-4" />
@@ -136,8 +156,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
                 {(selectedImage.size / 1024 / 1024).toFixed(2)} MB
              </span>
           </div>
-
-          {/* Analyze Button */}
           <button
             onClick={handleUpload}
             disabled={isLoading}
@@ -159,7 +177,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
         </div>
       )}
 
-      {/* Error Message */}
       {error && (
         <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg flex items-start gap-2 text-red-200 text-sm animate-fade-in">
           <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
