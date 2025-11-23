@@ -12,16 +12,20 @@ import {
   FileText,
   Brain,
   Calendar,
-  ActivitySquare // for the ML/Model icon
+  ActivitySquare
 } from 'lucide-react';
 import { cn } from '../../utils';
 import { useAuth, useIsStudent, useIsInstructor, useIsAdmin } from '../../store/auth';
+
+interface SidebarProps {
+  className?: string;
+  onClose?: () => void;
+}
 
 const baseNavigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['student', 'instructor', 'admin'] },
   { name: 'Courses', href: '/courses', icon: BookOpen, roles: ['student', 'instructor', 'admin'] },
   { name: 'AR Learning', href: '/ar-learning', icon: Box, roles: ['student'] },
-  // Model/ML Prediction entry
   { name: 'ML Prediction', href: '/ml-predict', icon: ActivitySquare, roles: ['student', 'instructor', 'admin'] },
 ];
 
@@ -49,7 +53,7 @@ const commonNavigation = [
   { name: 'Settings', href: '/settings', icon: Settings, roles: ['student', 'instructor', 'admin'] },
 ];
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<SidebarProps> = ({ className = '', onClose }) => {
   const location = useLocation();
   const { user } = useAuth();
   const isStudent = useIsStudent();
@@ -58,12 +62,10 @@ export const Sidebar: React.FC = () => {
 
   if (!user) return null;
 
-  // Filter base navigation based on user role
   const filteredBaseNavigation = baseNavigation.filter(item => 
     item.roles.includes(user.role)
   );
 
-  // Get role-specific navigation
   const getRoleSpecificNavigation = () => {
     if (isStudent) return studentNavigation;
     if (isInstructor) return instructorNavigation;
@@ -74,36 +76,30 @@ export const Sidebar: React.FC = () => {
   const roleSpecificNav = getRoleSpecificNavigation();
 
   return (
-    <div className="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 pt-16 overflow-y-auto">
-      <div className="flex flex-col h-full">
-        {/* User Info Section */}
+    <div className={className}>
+      <div className="flex flex-col h-full pt-16">
+        {/* User Info */}
         <div className="px-4 py-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="h-10 w-10 bg-gradient-to-br from-primary-500 to-medical-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-medium">
-                {user.name.charAt(0).toUpperCase()}
-              </span>
+              <span className="text-white font-medium">{user.name.charAt(0).toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {user.name}
-              </p>
-              <p className="text-xs text-gray-500 capitalize">
-                {user.role}
-              </p>
+              <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+              <p className="text-xs text-gray-500 capitalize">{user.role}</p>
             </div>
           </div>
-          
+
           {/* Progress Bar for Students */}
           {isStudent && (
             <div className="mt-3">
               <div className="flex justify-between text-xs text-gray-600 mb-1">
                 <span>Overall Progress</span>
-                <span>75%</span>
+                <span>75%</span> {/* Ideally dynamic */}
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-primary-500 to-medical-500 h-2 rounded-full transition-all duration-300" 
+                <div
+                  className="bg-gradient-to-r from-primary-500 to-medical-500 h-2 rounded-full transition-all duration-300"
                   style={{ width: '75%' }}
                 />
               </div>
@@ -112,16 +108,17 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-6">
-          {/* Main Navigation */}
+        <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto">
+          {/* Base Navigation */}
           <div>
             <ul className="space-y-1">
-              {filteredBaseNavigation.map((item) => {
+              {filteredBaseNavigation.map(item => {
                 const isActive = location.pathname === item.href;
                 return (
                   <li key={item.name}>
                     <Link
                       to={item.href}
+                      onClick={onClose}
                       className={cn(
                         'flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200',
                         isActive
@@ -143,7 +140,7 @@ export const Sidebar: React.FC = () => {
             </ul>
           </div>
 
-          {/* Role-specific Navigation */}
+          {/* Role-Specific Navigation */}
           {roleSpecificNav.length > 0 && (
             <div>
               <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
@@ -152,12 +149,13 @@ export const Sidebar: React.FC = () => {
                 {isAdmin && 'Administration'}
               </h3>
               <ul className="space-y-1">
-                {roleSpecificNav.map((item) => {
+                {roleSpecificNav.map(item => {
                   const isActive = location.pathname === item.href;
                   return (
                     <li key={item.name}>
                       <Link
                         to={item.href}
+                        onClick={onClose}
                         className={cn(
                           'flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200',
                           isActive
@@ -186,12 +184,13 @@ export const Sidebar: React.FC = () => {
               Account
             </h3>
             <ul className="space-y-1">
-              {commonNavigation.map((item) => {
+              {commonNavigation.map(item => {
                 const isActive = location.pathname === item.href;
                 return (
                   <li key={item.name}>
                     <Link
                       to={item.href}
+                      onClick={onClose}
                       className={cn(
                         'flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200',
                         isActive
@@ -217,9 +216,7 @@ export const Sidebar: React.FC = () => {
         {/* Footer */}
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center justify-center">
-            <p className="text-xs text-gray-500">
-              MedAR Learn v1.0.0
-            </p>
+            <p className="text-xs text-gray-500">MedAR Learn v1.0.0</p>
           </div>
         </div>
       </div>

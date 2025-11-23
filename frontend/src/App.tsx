@@ -17,6 +17,9 @@ import { AchievementsPage } from './pages/Achievements';
 import { SchedulePage } from './pages/Schedule';
 import { MyCoursesPage } from './pages/MyCourses';
 import { MLPredictionPage } from './pages/MLPredictionPage';
+import { CourseDetail } from './pages/CourseDetail';
+import { CreateCoursePage } from './pages/CreateCoursePage';
+import { CreateLessonPage } from './pages/CreateLessonPage';
 
 // Loading Component
 const LoadingSpinner: React.FC = () => (
@@ -203,6 +206,9 @@ function App() {
               </Layout>
             } 
           />
+          <Route path="/courses/:id" element={<CourseDetail />} />
+          <Route path="/my-courses/create" element={<CreateCoursePage />} />
+          <Route path="/my-courses/:courseId/lessons/create" element={<CreateLessonPage />} />
         </Routes>
 
         <Toaster

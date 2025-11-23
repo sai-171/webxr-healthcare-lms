@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Plus, Search, Filter, Users, BookOpen, Star, TrendingUp, Edit, Eye } from 'lucide-react';
 import { useAuth } from '../store/auth';
 import type { Course } from '../types';
+import { Link } from 'react-router-dom';
 
 export const MyCoursesPage: React.FC = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'published' | 'draft' | 'archived'>('all');
 
+  // Demo data—replace with API data in production
   const myCourses: Course[] = [
     {
       id: '1',
@@ -17,7 +19,7 @@ export const MyCoursesPage: React.FC = () => {
       instructor: user?.name || 'Dr. Sarah Johnson',
       instructorId: user?.id || '1',
       thumbnail: '/images/heart-course.jpg',
-      duration: 480, // 8 hours
+      duration: 480,
       level: 'advanced',
       category: 'Cardiology',
       lessons: [],
@@ -40,7 +42,7 @@ export const MyCoursesPage: React.FC = () => {
       instructor: user?.name || 'Dr. Sarah Johnson',
       instructorId: user?.id || '1',
       thumbnail: '/images/lungs-course.jpg',
-      duration: 360, // 6 hours
+      duration: 360,
       level: 'intermediate',
       category: 'Pulmonology',
       lessons: [],
@@ -63,7 +65,7 @@ export const MyCoursesPage: React.FC = () => {
       instructor: user?.name || 'Dr. Sarah Johnson',
       instructorId: user?.id || '1',
       thumbnail: '/images/imaging-course.jpg',
-      duration: 240, // 4 hours
+      duration: 240,
       level: 'beginner',
       category: 'Radiology',
       lessons: [],
@@ -81,9 +83,10 @@ export const MyCoursesPage: React.FC = () => {
   ];
 
   const filteredCourses = myCourses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          course.description.toLowerCase().includes(searchTerm.toLowerCase());
-    // Note: In a real app, you'd have a status field to filter by
+    const matchesSearch =
+      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.description.toLowerCase().includes(searchTerm.toLowerCase());
+    // For demo, status filter is not applied
     return matchesSearch;
   });
 
@@ -91,18 +94,20 @@ export const MyCoursesPage: React.FC = () => {
   const averageRating = myCourses.reduce((sum, course) => sum + course.rating, 0) / myCourses.length;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="container mx-auto px-4 space-y-6 pb-12">
+      {/* Header and Create Course */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">My Courses</h1>
           <p className="text-gray-600">Manage and track your course content</p>
         </div>
-        
-        <button className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors mt-4 sm:mt-0">
-          <Plus className="w-4 h-4" />
-          <span>Create Course</span>
-        </button>
+
+        <Link to="/my-courses/create" className="mt-4 sm:mt-0">
+          <button className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+            <Plus className="w-4 h-4" />
+            <span>Create Course</span>
+          </button>
+        </Link>
       </div>
 
       {/* Stats Overview */}
@@ -118,7 +123,6 @@ export const MyCoursesPage: React.FC = () => {
             </div>
           </div>
         </div>
-
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -130,7 +134,6 @@ export const MyCoursesPage: React.FC = () => {
             </div>
           </div>
         </div>
-
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -142,7 +145,6 @@ export const MyCoursesPage: React.FC = () => {
             </div>
           </div>
         </div>
-
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -170,7 +172,6 @@ export const MyCoursesPage: React.FC = () => {
               aria-label="Search courses"
             />
           </div>
-          
           <div className="flex gap-2">
             <select
               value={selectedFilter}
@@ -184,7 +185,6 @@ export const MyCoursesPage: React.FC = () => {
               <option value="draft">Draft</option>
               <option value="archived">Archived</option>
             </select>
-            
             <button 
               className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
               aria-label="Apply filters"
@@ -199,11 +199,15 @@ export const MyCoursesPage: React.FC = () => {
       {/* Courses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCourses.map((course) => (
-          <div key={course.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+          <Link
+            to={`/my-courses/${course.id}`}
+            key={course.id}
+            className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow block"
+            style={{ textDecoration: 'none' }}
+          >
             <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
               <BookOpen className="w-16 h-16 text-blue-500 opacity-50" />
             </div>
-            
             <div className="p-6">
               <div className="flex justify-between items-start mb-3">
                 <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">{course.title}</h3>
@@ -215,9 +219,7 @@ export const MyCoursesPage: React.FC = () => {
                   {course.level}
                 </span>
               </div>
-              
               <p className="text-gray-600 text-sm mb-4 line-clamp-2">{course.description}</p>
-              
               <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center">
@@ -233,7 +235,6 @@ export const MyCoursesPage: React.FC = () => {
                   {course.duration} min
                 </div>
               </div>
-
               <div className="flex items-center justify-between">
                 <div className="flex space-x-1">
                   {course.tags.slice(0, 2).map((tag, index) => (
@@ -247,26 +248,29 @@ export const MyCoursesPage: React.FC = () => {
                     </span>
                   )}
                 </div>
-                
                 <div className="flex space-x-2">
-                  <button 
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                    aria-label={`View details for ${course.title}`}
-                    title="View details"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  <button 
+                  <Link
+                    to={`/my-courses/${course.id}/edit`}
                     className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
                     aria-label={`Edit ${course.title}`}
                     title="Edit course"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <Edit className="w-4 h-4" />
-                  </button>
+                  </Link>
+                  <Link
+                    to={`/my-courses/${course.id}/view`}
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label={`View details for ${course.title}`}
+                    title="View details"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Eye className="w-4 h-4" />
+                  </Link>
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -275,9 +279,11 @@ export const MyCoursesPage: React.FC = () => {
           <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No courses found</h3>
           <p className="text-gray-600 mb-4">Get started by creating your first course.</p>
-          <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-            Create Course
-          </button>
+          <Link to="/my-courses/create">
+            <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+              Create Course
+            </button>
+          </Link>
         </div>
       )}
     </div>
