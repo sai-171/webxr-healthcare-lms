@@ -1,10 +1,11 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Request
+from fastapi import FastAPI, File, UploadFile, HTTPException, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from typing import List, Optional, Dict
+from typing import List
 import logging
 import time
 from contextlib import asynccontextmanager
+import os
 
 from .services.medical_image_service import get_medical_image_service
 from .services.prediction_service import get_prediction_service
@@ -13,14 +14,20 @@ from .models.model_loader import get_model_loader
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Use environment variable or default model
+DEFAULT_MODEL_TYPE = os.getenv("MODEL_TYPE", "mobilenetv2").lower()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting Healthcare AR Platform...")
 
     try:
-        model_loader = get_model_loader()
+        model_loader = get_model_loader(
+            model_path=f"trained_models/{'mobilenetv2_small_model.pth' if DEFAULT_MODEL_TYPE=='mobilenetv2' else 'enhanced_hybrid_model.pth'}",
+            model_type=DEFAULT_MODEL_TYPE
+        )
         model_loader.load_model()
-        logger.info("Medical image classifier loaded successfully")
+        logger.info(f"{DEFAULT_MODEL_TYPE} classifier loaded successfully")
         yield
 
     except Exception as e:
@@ -32,7 +39,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Healthcare AR Learning Platform API",
-    description="Medical Image Classification API",
+    description="Medical Image Analysis API",
     version="2.0.0",
     lifespan=lifespan,
 )
@@ -79,25 +86,35 @@ async def health_check():
         return JSONResponse(status_code=503, content={"status": "unhealthy", "error": str(e)})
 
 @app.post("/api/medical/predict")
-async def predict_medical_image(file: UploadFile = File(...), generate_explanation: bool = True):
+async def predict_medical_image(
+    file: UploadFile = File(...),
+    generate_explanation: bool = True,
+    model_type: str = Query(DEFAULT_MODEL_TYPE, enum=["mobilenetv2", "hybrid_cnn_vit"])
+):
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
-    medical_service = get_medical_image_service()
-    result = await medical_service.analyze_image(file=file, generate_explanation=generate_explanation)
+
+    prediction_service = get_prediction_service(model_type=model_type)
+    result = await prediction_service.analyze_image(file=file, generate_explanation=generate_explanation)
     return result
 
 @app.post("/api/medical/batch-predict")
-async def batch_predict_medical_images(files: List[UploadFile] = File(...), generate_explanations: bool = False):
+async def batch_predict_medical_images(
+    files: List[UploadFile] = File(...), 
+    generate_explanations: bool = False,
+    model_type: str = Query(DEFAULT_MODEL_TYPE, enum=["mobilenetv2", "hybrid_cnn_vit"])
+):
     if len(files) > 10:
         raise HTTPException(status_code=400, detail="Maximum 10 files allowed per batch")
-    medical_service = get_medical_image_service()
-    results = await medical_service.batch_analyze(files=files, generate_explanations=generate_explanations)
+
+    prediction_service = get_prediction_service(model_type=model_type)
+    results = await prediction_service.batch_analyze(files=files, generate_explanations=generate_explanations)
     return {"success": True, "total_files": len(files), "results": results}
 
 @app.get("/api/medical/model-info")
-async def get_model_information():
+async def get_model_information(model_type: str = Query(DEFAULT_MODEL_TYPE, enum=["mobilenetv2", "hybrid_cnn_vit"])):
     try:
-        prediction_service = get_prediction_service()
+        prediction_service = get_prediction_service(model_type=model_type)
         model_info = prediction_service.get_model_info()
         return model_info
     except Exception as e:
