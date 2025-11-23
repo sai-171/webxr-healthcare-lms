@@ -7,7 +7,7 @@ const DEMO_USERS: User[] = [
   {
     id: '1',
     email: 'demo@medar.com',
-    name: 'Alex Johnson',
+    name: 'Sairam',
     avatar: '/avatars/student.jpg',
     role: 'student',
     enrolledCourses: ['1', '2', '3'],
@@ -31,7 +31,7 @@ const DEMO_USERS: User[] = [
   {
     id: '2',
     email: 'instructor@medar.com',
-    name: 'Dr. Sarah Martinez',
+    name: 'Dr. Smith',
     avatar: '/avatars/instructor.jpg',
     role: 'instructor',
     enrolledCourses: [],
@@ -43,7 +43,7 @@ const DEMO_USERS: User[] = [
   {
     id: '3',
     email: 'admin@medar.com',
-    name: 'Michael Chen',
+    name: 'Saravana Sairam C',
     avatar: '/avatars/admin.jpg',
     role: 'admin',
     enrolledCourses: [],
