@@ -14,7 +14,6 @@ from .models.model_loader import get_model_loader
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Use environment variable or default model
 DEFAULT_MODEL_TYPE = os.getenv("MODEL_TYPE", "mobilenetv2").lower()
 
 @asynccontextmanager
@@ -95,7 +94,8 @@ async def predict_medical_image(
         raise HTTPException(status_code=400, detail="File must be an image")
 
     prediction_service = get_prediction_service(model_type=model_type)
-    result = await prediction_service.analyze_image(file=file, generate_explanation=generate_explanation)
+    image_bytes = await file.read()
+    result = await prediction_service.predict_from_bytes(image_bytes, generate_explanation)
     return result
 
 @app.post("/api/medical/batch-predict")
@@ -108,7 +108,8 @@ async def batch_predict_medical_images(
         raise HTTPException(status_code=400, detail="Maximum 10 files allowed per batch")
 
     prediction_service = get_prediction_service(model_type=model_type)
-    results = await prediction_service.batch_analyze(files=files, generate_explanations=generate_explanations)
+    image_bytes_list = [await file.read() for file in files]
+    results = await prediction_service.batch_predict(image_bytes_list, generate_explanations)
     return {"success": True, "total_files": len(files), "results": results}
 
 @app.get("/api/medical/model-info")
