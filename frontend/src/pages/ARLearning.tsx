@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-// FIX: Added 'type' keyword for ARSceneRef to satisfy verbatimModuleSyntax
 import { ARScene, type ARSceneRef } from '../components/ar/ARScene';
 import { ARAnnotations } from '../components/ar/ARAnnotations';
 import { AIAssistant } from '../components/ai/AIAssistant';
@@ -7,7 +6,7 @@ import { AIAssistant } from '../components/ai/AIAssistant';
 import {
   Box, Brain, Heart, Wind, Activity, Layers, Eye,
   Menu, X, ChevronRight, RotateCcw, GripHorizontal,
-  Minus, SlidersHorizontal, Trophy, Scissors, Droplet,
+  Minus, SlidersHorizontal, Scissors, Droplet,
   ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Crosshair
 } from 'lucide-react';
 
@@ -37,7 +36,6 @@ export const ARLearningPage: React.FC = () => {
   const [showAllLabels, setShowAllLabels] = useState(false);
   const [isolateParts, setIsolateParts] = useState<string[]>([]);
   const [transparencyToggled, setTransparencyToggled] = useState<string[]>([]);
-  const [visitedAnnotations, setVisitedAnnotations] = useState<Set<string>>(new Set());
   const [sliceValue, setSliceValue] = useState(0);
   const [opacityValue, setOpacityValue] = useState(100);
 
@@ -52,15 +50,12 @@ export const ARLearningPage: React.FC = () => {
   const sceneRef = useRef<ARSceneRef>(null);
 
   const selectedModel = anatomicalModels.find(m => m.id === selectedModelId);
-  const totalAnnotations = 20;
-  const progressPercentage = Math.min(100, Math.round((visitedAnnotations.size / totalAnnotations) * 100));
 
   useEffect(() => {
     setAnnotationLevel('basic');
     setShowAllLabels(false);
     setIsolateParts([]);
     setTransparencyToggled([]);
-    setVisitedAnnotations(new Set());
     setSliceValue(0);
     setOpacityValue(100);
     if (sceneRef.current) sceneRef.current.resetCamera();
@@ -102,7 +97,6 @@ export const ARLearningPage: React.FC = () => {
   };
 
   const handleReset = () => {
-    setVisitedAnnotations(new Set());
     setShowAllLabels(false);
     setIsolateParts([]);
     setTransparencyToggled([]);
@@ -114,9 +108,7 @@ export const ARLearningPage: React.FC = () => {
   return (
     <div className="relative w-full h-screen bg-gray-900 overflow-hidden">
       {/* --- AI Assistant --- */}
-      {selectedModel && (
-        <AIAssistant currentModelName={selectedModel.label} />
-      )}
+      {selectedModel && <AIAssistant currentModelName={selectedModel.label} />}
 
       {/* Main 3D Scene - fits all screens */}
       <div className="absolute inset-0 z-0">
@@ -131,7 +123,6 @@ export const ARLearningPage: React.FC = () => {
             transparencyToggled={transparencyToggled}
             sliceValue={sliceValue}
             opacityValue={opacityValue}
-            onAnnotationVisited={(id) => setVisitedAnnotations(prev => new Set(prev).add(id))}
             showAllLabels={showAllLabels}
           />
         ) : (
@@ -139,7 +130,7 @@ export const ARLearningPage: React.FC = () => {
         )}
         {/* Overlay annotations */}
         <div className="absolute inset-0 pointer-events-none z-10">
-          <ARAnnotations selectedAnnotationId={null} onAnnotationSelect={() => { }} showAllLabels={showAllLabels} />
+          <ARAnnotations selectedAnnotationId={null} onAnnotationSelect={() => {}} showAllLabels={showAllLabels} />
         </div>
       </div>
 
@@ -156,11 +147,17 @@ export const ARLearningPage: React.FC = () => {
           </button>
         </div>
         <div className="pointer-events-auto flex gap-1 sm:gap-2">
-          <button onClick={handleReset} className="bg-black/60 backdrop-blur-md text-white p-2 rounded-lg border border-white/10 hover:bg-red-900/50 transition-colors shadow-lg" title="Reset View" aria-label="Reset View">
+          <button onClick={handleReset}
+            className="bg-black/60 backdrop-blur-md text-white p-2 rounded-lg border border-white/10 hover:bg-red-900/50 transition-colors shadow-lg"
+            title="Reset View" aria-label="Reset View"
+          >
             <RotateCcw className="w-5 h-5" />
           </button>
           {!isRightPanelOpen && (
-            <button onClick={() => setIsRightPanelOpen(true)} className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition-colors shadow-lg" title="Open Tools" aria-label="Open Tools">
+            <button onClick={() => setIsRightPanelOpen(true)}
+              className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
+              title="Open Tools" aria-label="Open Tools"
+            >
               <SlidersHorizontal className="w-5 h-5" />
             </button>
           )}
@@ -254,9 +251,100 @@ export const ARLearningPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            {/* Complexity level, interactive tools and the rest remain unchanged; add sm:text-xs/text-sm where needed */}
 
-            {/* ... Rest of toolbar code unchanged, add responsive classes where needed ... */}
+            {/* Complexity Level */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Layers className="w-4 h-4 text-purple-400" />
+                <h3 className="font-semibold text-xs sm:text-sm">Complexity Level</h3>
+              </div>
+              <div className="flex p-1 bg-black/40 rounded-lg border border-white/5">
+                {['basic', 'intermediate', 'advanced'].map(level => (
+                  <button key={level}
+                    disabled={!selectedModel.annotationLevels.includes(level)}
+                    onClick={() => setAnnotationLevel(level as any)}
+                    className={`flex-1 py-1.5 text-xs font-medium rounded-md capitalize transition-all
+                      ${annotationLevel === level ? 'bg-purple-600 text-white shadow-md' : 'text-gray-400 hover:text-white'}
+                      ${!selectedModel.annotationLevels.includes(level) && 'opacity-20 cursor-not-allowed'}`}
+                    aria-label={`Set complexity to ${level}`}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Interactive Tools */}
+            <div className="mb-6">
+              <h3 className="font-semibold text-xs sm:text-sm mb-3 text-gray-300">Interactive Tools</h3>
+              <div className="mb-4 bg-white/5 p-3 rounded-lg border border-white/5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Scissors className="w-4 h-4 text-blue-400" />
+                    <span className="text-sm font-medium">Cross Section</span>
+                  </div>
+                  <span className="text-xs font-mono text-blue-300">{sliceValue}%</span>
+                </div>
+                <input type="range" min="0" max="100" value={sliceValue}
+                  onChange={(e) => setSliceValue(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  aria-label="Slice Control" title="Slice Control"
+                />
+              </div>
+              <div className="mb-2 bg-white/5 p-3 rounded-lg border border-white/5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Droplet className="w-4 h-4 text-cyan-400" />
+                    <span className="text-sm font-medium">Global Opacity</span>
+                  </div>
+                  <span className="text-xs font-mono text-cyan-300">{opacityValue}%</span>
+                </div>
+                <input type="range" min="0" max="100" value={opacityValue}
+                  onChange={(e) => setOpacityValue(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                  aria-label="Opacity Control" title="Opacity Control"
+                />
+              </div>
+            </div>
+
+            {/* Parts Visibility */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-purple-400" />
+                  <h3 className="font-semibold text-xs sm:text-sm">Parts Visibility</h3>
+                </div>
+                <button onClick={() => setShowAllLabels(!showAllLabels)}
+                  className={`text-xs px-2 py-1 rounded border transition-colors
+                    ${showAllLabels ? 'bg-purple-500/20 border-purple-500 text-purple-200' : 'border-gray-600 text-gray-400'}`}
+                  aria-label={showAllLabels ? "Hide Labels" : "Show Labels"}>
+                  {showAllLabels ? 'Hide Labels' : 'Show Labels'}
+                </button>
+              </div>
+              <div className="space-y-2">
+                {['Left', 'Right', 'Center'].map(part => (
+                  <div key={part}
+                    className="group flex items-center justify-between p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition-colors">
+                    <span className="text-sm text-gray-200">{part} Region</span>
+                    <div className="flex gap-2">
+                      <button onClick={() => toggleIsolation(part)}
+                        className={`p-1.5 rounded-md transition-colors
+                          ${isolateParts.includes(part) ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'}`}
+                        aria-label={`Isolate ${part}`}>
+                        <Box className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => toggleTransparency(part)}
+                        className={`p-1.5 rounded-md transition-colors
+                          ${transparencyToggled.includes(part) ? 'bg-blue-500 text-white' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'}`}
+                        aria-label={`Make ${part} Transparent`}>
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
       )}
