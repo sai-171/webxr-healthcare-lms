@@ -32,10 +32,10 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo and Mobile Menu Toggle */}
-          <div className="flex items-center space-x-6">  {/* Increased spacing here */}
+          {/* Logo + Mobile Menu */}
+          <div className="flex items-center space-x-3 sm:space-x-6 min-w-0">
             <button
               onClick={toggleSidebar}
               className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 lg:hidden"
@@ -44,11 +44,11 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             >
               <Menu className="h-6 w-6" />
             </button>
-            <Link to="/" className="flex items-center space-x-3">
-              <img src={ARIcon} alt="Augmented Reality Icon" className="h-6 w-6" />
-              <div className="flex flex-col">
-                <span className="text-xl font-bold text-gray-900">MedAR Learn</span>
-                <span className="text-xs text-gray-500 hidden sm:block">
+            <Link to="/" className="flex items-center min-w-0 space-x-2 sm:space-x-3">
+              <img src={ARIcon} alt="Augmented Reality Icon" className="h-6 w-6 shrink-0" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-xl font-bold text-gray-900 truncate">MedAR Learn</span>
+                <span className="text-xs text-gray-500 hidden sm:block truncate">
                   Healthcare AR Education
                 </span>
               </div>
@@ -56,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           </div>
 
           {/* Right Navigation */}
-          <div className="flex items-center space-x-6"> {/* Increased spacing here */}
+          <div className="flex items-center space-x-3 sm:space-x-6 min-w-0">
             {user ? (
               <>
                 {user.role === 'student' && (
@@ -68,11 +68,10 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                   </div>
                 )}
 
+                {/* Notification Bell - always visible on mobile */}
                 <button
                   className="relative p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
-                  aria-label={`Notifications ${
-                    mockNotificationCount > 0 ? `(${mockNotificationCount} unread)` : ''
-                  }`}
+                  aria-label={`Notifications ${mockNotificationCount > 0 ? `(${mockNotificationCount} unread)` : ''}`}
                 >
                   <Bell className="h-6 w-6" />
                   {mockNotificationCount > 0 && (
@@ -85,6 +84,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                   )}
                 </button>
 
+                {/* User Menu */}
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
@@ -98,9 +98,9 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                         {user.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <div className="hidden md:block text-left">
-                      <div className="text-sm font-medium text-gray-700">{user.name}</div>
-                      <div className="text-xs text-gray-500 capitalize">{user.role}</div>
+                    <div className="hidden md:block text-left min-w-0">
+                      <div className="text-sm font-medium text-gray-700 truncate">{user.name}</div>
+                      <div className="text-xs text-gray-500 capitalize truncate">{user.role}</div>
                     </div>
                     <ChevronDown
                       className={cn(
@@ -111,6 +111,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                     />
                   </button>
 
+                  {/* User Dropdown */}
                   {showUserMenu && (
                     <div
                       className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50"
@@ -150,7 +151,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 </div>
               </>
             ) : (
-              <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-3 sm:space-x-6">
                 <Link
                   to="/login"
                   className="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"

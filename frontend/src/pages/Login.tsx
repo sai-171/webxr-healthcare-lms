@@ -44,66 +44,61 @@ export const LoginPage: React.FC = () => {
       color: 'from-blue-500 to-blue-600'
     },
     {
-      role: 'Instructor', 
+      role: 'Instructor',
       email: 'instructor@medar.com',
       description: 'Manage courses, view analytics, student progress',
       color: 'from-green-500 to-green-600'
     },
     {
       role: 'Admin',
-      email: 'admin@medar.com', 
+      email: 'admin@medar.com',
       description: 'Full system access, user management, system settings',
       color: 'from-purple-500 to-purple-600'
     }
   ];
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Panel - Hero Section */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-medical-500 to-primary-700 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50">
+      {/* Hero Section - hidden on mobile */}
+      <div className="hidden lg:flex lg:flex-1 items-center justify-center bg-gradient-to-br from-primary-600 via-medical-500 to-primary-700 relative">
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 flex flex-col justify-center px-12 text-white">
+        <div className="relative z-10 w-full max-w-xl flex flex-col justify-center p-8 xl:p-12 text-white">
           <div className="flex items-center mb-8">
             <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
               <Heart className="h-8 w-8" />
             </div>
             <span className="ml-3 text-2xl font-bold">MedAR Learn</span>
           </div>
-          
           <h1 className="text-4xl font-bold mb-6 leading-tight">
             Experience the Future of
             <br />
             <span className="text-yellow-300">Medical Education</span>
           </h1>
-          
           <p className="text-lg opacity-90 mb-8 leading-relaxed">
-            Learn anatomy, pathology, and medical procedures through immersive 
+            Learn anatomy, pathology, and medical procedures through immersive
             augmented reality experiences powered by advanced AI assistance.
           </p>
-
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
+          <ul className="space-y-4">
+            <li className="flex items-center space-x-3">
               <div className="h-2 w-2 bg-yellow-300 rounded-full" />
               <span>Interactive 3D anatomical models</span>
-            </div>
-            <div className="flex items-center space-x-3">
+            </li>
+            <li className="flex items-center space-x-3">
               <div className="h-2 w-2 bg-yellow-300 rounded-full" />
               <span>AI-powered medical Q&A assistant</span>
-            </div>
-            <div className="flex items-center space-x-3">
+            </li>
+            <li className="flex items-center space-x-3">
               <div className="h-2 w-2 bg-yellow-300 rounded-full" />
               <span>Progress tracking and achievements</span>
-            </div>
-          </div>
+            </li>
+          </ul>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32" />
         </div>
-        
-        {/* Background Pattern */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32" />
       </div>
 
-      {/* Right Panel - Login Form */}
-      <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-16">
+      {/* Login Form Section */}
+      <div className="flex-1 flex flex-col justify-center px-4 sm:px-10 lg:px-20 bg-white">
         <div className="w-full max-w-md mx-auto">
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center mb-8">
@@ -114,9 +109,7 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome back
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h2>
             <p className="text-gray-600">
               Sign in to continue your medical learning journey
             </p>
@@ -124,19 +117,19 @@ export const LoginPage: React.FC = () => {
 
           {/* Demo Account Section */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
-              Try with demo accounts:
-            </h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Try with demo accounts:</h3>
             <div className="grid gap-2">
               {demoAccounts.map((account) => (
                 <button
                   key={account.role}
+                  type="button"
                   onClick={() => handleDemoLogin(account.email, account.role)}
                   className={`p-3 rounded-lg border text-left transition-all hover:shadow-md ${
                     selectedDemo === account.role
                       ? 'border-primary-500 bg-primary-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
+                  aria-label={`Demo login as ${account.role}`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -144,9 +137,7 @@ export const LoginPage: React.FC = () => {
                         <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${account.color}`} />
                         <span className="font-medium text-gray-900">{account.role}</span>
                       </div>
-                      <p className="text-xs text-gray-600 mt-1">
-                        {account.description}
-                      </p>
+                      <p className="text-xs text-gray-600 mt-1">{account.description}</p>
                     </div>
                     <ArrowRight className="h-4 w-4 text-gray-400" />
                   </div>
@@ -172,6 +163,7 @@ export const LoginPage: React.FC = () => {
                 type="email"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="Enter your email"
+                autoComplete="email"
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
@@ -194,11 +186,13 @@ export const LoginPage: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent pr-10"
                   placeholder="Enter your password"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />
@@ -234,7 +228,6 @@ export const LoginPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Demo Info */}
           <div className="mt-6 p-3 bg-blue-50 rounded-lg">
             <p className="text-xs text-blue-700 text-center">
               🚀 Demo Mode: Use password "demo123" for all demo accounts
