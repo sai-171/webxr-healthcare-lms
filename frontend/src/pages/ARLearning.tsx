@@ -21,13 +21,42 @@ const getModelIcon = (id: string) => {
   }
 };
 
+const BLOB_BASE_URL = 'https://sniqhfp9xi52lvz6.public.blob.vercel-storage.com/';
+
 const anatomicalModels = [
-  { id: 'heart', label: 'Heart', modelPath: '/models/heart.glb', annotationLevels: ['basic', 'intermediate', 'advanced'] },
-  { id: 'brain', label: 'Brain', modelPath: '/models/human-brain.glb', annotationLevels: ['basic', 'intermediate'] },
-  { id: 'lungs', label: 'Lungs', modelPath: '/models/realistic_human_lungs.glb', annotationLevels: ['basic', 'advanced'] },
-  { id: 'kidney', label: 'Kidneys', modelPath: '/models/kidney.glb', annotationLevels: ['basic'] },
-  { id: 'intestine', label: 'Intestines', modelPath: '/models/small_and_large_intestine.glb', annotationLevels: ['basic', 'intermediate'] },
+    { 
+        id: 'heart', 
+        label: 'Heart', 
+        modelPath: BLOB_BASE_URL + 'heart.glb', 
+        annotationLevels: ['basic', 'intermediate', 'advanced'] 
+    },
+    { 
+        id: 'brain', 
+        label: 'Brain', 
+        modelPath: BLOB_BASE_URL + 'human-brain.glb', 
+        annotationLevels: ['basic', 'intermediate'] 
+    },
+    { 
+        id: 'lungs', 
+        label: 'Lungs', 
+        modelPath: BLOB_BASE_URL + 'realistic_human_lungs.glb', 
+        annotationLevels: ['basic', 'advanced'] 
+    },
+    { 
+        id: 'kidney', 
+        label: 'Kidneys', 
+        modelPath: BLOB_BASE_URL + 'kidney.glb', 
+        annotationLevels: ['basic'] 
+    },
+    { 
+        id: 'intestine', 
+        label: 'Intestines',
+        modelPath: BLOB_BASE_URL + 'small_and_large_intestine.glb', 
+        annotationLevels: ['basic', 'intermediate'] 
+    },
 ];
+
+// ... rest of your component
 
 export const ARLearningPage: React.FC = () => {
   const [selectedModelId, setSelectedModelId] = useState('heart');
