@@ -165,8 +165,8 @@ export const ARScene = forwardRef<ARSceneRef, ARSceneProps>((props, ref) => {
 });
 
 // Preload models
-useGLTF.preload('/models/heart.glb');
-useGLTF.preload('/models/human-brain.glb');
-useGLTF.preload('/models/realistic_human_lungs.glb');
-useGLTF.preload('/models/kidney.glb');
-useGLTF.preload('/models/small_and_large_intestine.glb');
+useGLTF.preload('https://sniqhfp9xi52lvz6.public.blob.vercel-storage.com/heart.glb');
+useGLTF.preload('https://sniqhfp9xi52lvz6.public.blob.vercel-storage.com/human-brain.glb');
+useGLTF.preload('https://sniqhfp9xi52lvz6.public.blob.vercel-storage.com/kidney.glb');
+useGLTF.preload('https://sniqhfp9xi52lvz6.public.blob.vercel-storage.com/realistic_human_lungs.glb');
+useGLTF.preload('https://sniqhfp9xi52lvz6.public.blob.vercel-storage.com/small_and_large_intestine.glb');
