@@ -1,10 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon, Loader2, AlertCircle, ScanSearch } from 'lucide-react';
-// Import your existing API service
 import { predictMedicalImage } from '../../services/api';
 
-// Toggle hybrid option based on environment variable
-const enableHybridModel = import.meta.env.VITE_ENABLE_HYBRID_MODEL === 'true';
+// Enable hybrid model only if environment variable is set to true OR running on localhost
+const enableHybridModel =
+  import.meta.env.VITE_ENABLE_HYBRID_MODEL === 'true' ||
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1';
 
 interface ImageUploaderProps {
   onPrediction: (result: any) => void;
@@ -57,8 +59,12 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
     setIsLoading(true);
     setError(null);
     try {
-      // Pass selected modelType!
-      const predictionResult = await predictMedicalImage(selectedImage, modelType, true);
+      // Only allow hybrid model in local mode
+      const usedModelType =
+        modelType === "hybrid_cnn_vit" && !enableHybridModel
+          ? "mobilenetv2"
+          : modelType;
+      const predictionResult = await predictMedicalImage(selectedImage, usedModelType, true);
       onPrediction(predictionResult);
     } catch (err: any) {
       console.error("Upload error:", err);
@@ -68,34 +74,33 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onPrediction }) =>
     }
   };
 
-return (
-   <div className="w-full">
-   {/* --- Model Selector Dropdown --- */}
-     {/* FIX: Replace 'gap-2 mb-3' with a responsive flex container.
-        We'll use 'w-full' to ensure it takes full width, and 'items-center' 
-        to keep the label and select aligned.
-        We add 'flex' and 'justify-between' or 'flex-grow' to control spacing.
-      */}
-     <div className="flex w-full items-center mb-3"> 
-     <label htmlFor="model-select" className="text-sm font-medium text-gray-300 flex-shrink-0 mr-3">
-         Model:
+  return (
+    <div className="w-full">
+      {/* Model Selector Dropdown */}
+      <div className="flex w-full items-center mb-3">
+        <label
+          htmlFor="model-select"
+          className="text-sm font-medium text-gray-300 flex-shrink-0 mr-3"
+        >
+          Model:
         </label>
-        <select
-          id="model-select"
-          value={modelType}
-          onChange={(e) => setModelType(e.target.value as 'mobilenetv2' | 'hybrid_cnn_vit')}
-          disabled={isLoading}
-          // FIX: Add 'flex-grow' or 'w-full' to make the select element take up the remaining space
-          className="bg-gray-800 text-gray-100 p-2 rounded border border-gray-700 focus:border-purple-400 transition w-full"
-        >
-          <option value="mobilenetv2">MobileNetV2 (Fast)</option>
-          {enableHybridModel && (
-            <option value="hybrid_cnn_vit">Hybrid CNN-ViT (Advanced, local only)</option>
-          )}
-        </select>
-      </div>
+        <select
+          id="model-select"
+          value={modelType}
+          onChange={(e) =>
+            setModelType(e.target.value as 'mobilenetv2' | 'hybrid_cnn_vit')
+          }
+          disabled={isLoading}
+          className="bg-gray-800 text-gray-100 p-2 rounded border border-gray-700 focus:border-purple-400 transition w-full"
+        >
+          <option value="mobilenetv2">MobileNetV2 (Fast)</option>
+          {enableHybridModel && (
+            <option value="hybrid_cnn_vit">Hybrid CNN-ViT (Advanced, local only)</option>
+          )}
+        </select>
+      </div>
 
-      {/* --- Hidden Native Input --- */}
+      {/* Hidden Native Input */}
       <input
         id="image-upload"
         type="file"
@@ -119,7 +124,7 @@ return (
         >
           <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
             <div className="p-4 bg-gray-700/50 rounded-full mb-4 group-hover:bg-purple-500/20 transition-colors">
-                <Upload className="w-8 h-8 text-gray-400 group-hover:text-purple-400 transition-colors" />
+              <Upload className="w-8 h-8 text-gray-400 group-hover:text-purple-400 transition-colors" />
             </div>
             <p className="mb-2 text-sm text-gray-300 font-medium">
               <span className="text-purple-400">Click to upload</span> or drag and drop
@@ -132,9 +137,9 @@ return (
       ) : (
         <div className="space-y-4 animate-fade-in">
           <div className="relative w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center group">
-            <img 
-              src={previewUrl!} 
-              alt="Preview" 
+            <img
+              src={previewUrl!}
+              alt="Preview"
               className="max-h-full max-w-full object-contain"
             />
             <button
@@ -148,13 +153,13 @@ return (
             </button>
           </div>
           <div className="flex items-center justify-between px-2 text-sm text-gray-400">
-             <div className="flex items-center gap-2">
-                <ImageIcon className="w-4 h-4" />
-                <span className="truncate max-w-[150px]">{selectedImage.name}</span>
-             </div>
-             <span className="text-xs bg-white/10 px-2 py-0.5 rounded">
-                {(selectedImage.size / 1024 / 1024).toFixed(2)} MB
-             </span>
+            <div className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" />
+              <span className="truncate max-w-[150px]">{selectedImage.name}</span>
+            </div>
+            <span className="text-xs bg-white/10 px-2 py-0.5 rounded">
+              {(selectedImage.size / 1024 / 1024).toFixed(2)} MB
+            </span>
           </div>
           <button
             onClick={handleUpload}
