@@ -6,6 +6,7 @@ import { Eye, EyeOff, Heart, ArrowRight } from 'lucide-react';
 import { useAuth } from '../store/auth';
 import { Button } from '../components/shared/Button';
 import type { LoginCredentials } from '../types';
+import logoSrc from '../assets/augmented-reality.png';
 
 export const LoginPage: React.FC = () => {
   const { login, isLoading, error } = useAuth();
@@ -65,7 +66,7 @@ export const LoginPage: React.FC = () => {
         <div className="relative z-10 w-full max-w-xl flex flex-col justify-center p-8 xl:p-12 text-white">
           <div className="flex items-center mb-8">
             <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-              <Heart className="h-8 w-8" />
+              <img src={logoSrc} alt="MedAR Learn Logo" className="h-8 w-8" />
             </div>
             <span className="ml-3 text-2xl font-bold">MedAR Learn</span>
           </div>
