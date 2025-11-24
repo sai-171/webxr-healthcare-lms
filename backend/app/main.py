@@ -11,6 +11,19 @@ from .services.medical_image_service import get_medical_image_service
 from .services.prediction_service import get_prediction_service
 from .models.model_loader import get_model_loader
 
+# --- Configuration for Live Deployment ---
+# IMPORTANT: Replace these placeholders with your actual live URLs.
+# You can use a single list for both local and deployed origins.
+# Use an environment variable for the live URL in a production setup.
+LIVE_FRONTEND_URL = os.getenv("FRONTEND_URL", "https://webxr-healthcare-lms.vercel.app")
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    LIVE_FRONTEND_URL, 
+]
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -31,6 +44,9 @@ async def lifespan(app: FastAPI):
 
     except Exception as e:
         logger.error(f"Startup failed: {e}")
+        # In a robust production environment, you might catch the exception
+        # but let the application start as 'unhealthy' instead of crashing the startup.
+        # For now, we keep the original 'raise'.
         raise
 
     finally:
@@ -43,13 +59,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# --- CORSMiddleware FIX ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173", "http://127.0.0.1:5173"],
+    # Use the combined list of allowed origins
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# ---------------------------
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
